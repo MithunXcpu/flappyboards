@@ -36,6 +36,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# claude / mcp
+.claude/
+.mcp.json
+
 # skills cache
 .agents/
 skills-lock.json
