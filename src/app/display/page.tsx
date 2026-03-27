@@ -13,6 +13,9 @@ import { useSettingsStore } from "@/stores/settings-store";
 import { ContentRotator } from "@/lib/content/content-rotator";
 import { QUOTES } from "@/lib/content/quotes";
 import ThemeToggle from "@/components/ThemeToggle";
+import MusicPlayer from "@/components/music/MusicPlayer";
+import { useMusicStore } from "@/stores/music-store";
+import { formatNowPlaying } from "@/lib/content/now-playing";
 
 export default function DisplayPage() {
   const boardRef = useRef<SplitFlapBoardRef>(null);
@@ -21,6 +24,10 @@ export default function DisplayPage() {
   const scale = useResponsiveScale();
   const { audioEngine } = useAudioEngine();
   const rotatorRef = useRef(new ContentRotator(QUOTES));
+  const rotationCountRef = useRef(0);
+  const musicSource = useMusicStore((s) => s.source);
+  const musicIsPlaying = useMusicStore((s) => s.isPlaying);
+  const currentTrack = useMusicStore((s) => s.currentTrack);
 
   // Read settings from store
   const flipSpeed = useSettingsStore((s) => s.flipSpeed);
@@ -45,9 +52,21 @@ export default function DisplayPage() {
   );
 
   const cycleNext = useCallback(async () => {
+    rotationCountRef.current++;
+    // Every 3rd rotation, show "Now Playing" if music is active
+    if (
+      musicIsPlaying &&
+      musicSource !== "off" &&
+      currentTrack &&
+      rotationCountRef.current % 3 === 0
+    ) {
+      const npLines = formatNowPlaying(currentTrack.title, currentTrack.artist);
+      await showMessage(npLines);
+      return;
+    }
     const content = rotatorRef.current.next();
     await showMessage(content.lines);
-  }, [showMessage]);
+  }, [showMessage, musicIsPlaying, musicSource, currentTrack]);
 
   // Initial message + auto-rotation
   useEffect(() => {
@@ -162,6 +181,8 @@ export default function DisplayPage() {
           </a>
         </div>
       </div>
+
+      <MusicPlayer />
 
       <SettingsPanel
         onSendMessage={(lines) => {

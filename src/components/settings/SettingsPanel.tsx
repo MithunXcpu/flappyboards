@@ -4,6 +4,11 @@ import { useState, useEffect, useCallback } from "react";
 import { useSettingsStore } from "@/stores/settings-store";
 import { audioEngine } from "@/lib/audio/audio-engine";
 import ThemeToggle from "@/components/ThemeToggle";
+import QRCode from "@/components/QRCode";
+import { encodeConfig } from "@/lib/config/url-config";
+import { useTheme } from "@/components/ThemeProvider";
+import MusicSettings from "@/components/music/MusicSettings";
+import CastButton from "@/components/cast/CastButton";
 
 interface SettingsPanelProps {
   onSendMessage?: (lines: string[]) => void;
@@ -13,6 +18,23 @@ export default function SettingsPanel({ onSendMessage }: SettingsPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [customText, setCustomText] = useState("");
   const settings = useSettingsStore();
+  const { theme } = useTheme();
+  const [origin, setOrigin] = useState("");
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const tvUrl = origin
+    ? `${origin}/tv?config=${encodeConfig({
+        theme: theme as "dark" | "light",
+        flipSpeed: settings.flipSpeed,
+        staggerDelay: settings.staggerDelay,
+        rotationInterval: settings.rotationInterval,
+        volume: settings.volume,
+        isMuted: settings.isMuted,
+      })}`
+    : "";
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape") {
@@ -99,8 +121,8 @@ export default function SettingsPanel({ onSendMessage }: SettingsPanelProps) {
         zIndex: 50,
         width: 300,
         background: "var(--glass-bg-solid)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        backdropFilter: "blur(24px) saturate(1.2)",
+        WebkitBackdropFilter: "blur(24px) saturate(1.2)",
         borderLeft: "1px solid var(--border)",
         padding: "28px 24px",
         overflowY: "auto",
@@ -225,7 +247,7 @@ export default function SettingsPanel({ onSendMessage }: SettingsPanelProps) {
       </Section>
 
       {/* Volume */}
-      <Section label={`VOLUME — ${Math.round(settings.volume * 100)}%`}>
+      <Section label={`CLACK VOLUME — ${Math.round(settings.volume * 100)}%`}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <div style={{ flex: 1 }}>
             <RangeInput min={0} max={1} step={0.05} value={settings.volume} onChange={settings.setVolume} />
@@ -250,6 +272,11 @@ export default function SettingsPanel({ onSendMessage }: SettingsPanelProps) {
             {settings.isMuted ? "UNMUTE" : "MUTE"}
           </button>
         </div>
+      </Section>
+
+      {/* Music */}
+      <Section label="MUSIC">
+        <MusicSettings />
       </Section>
 
       {/* Fullscreen */}
@@ -280,6 +307,67 @@ export default function SettingsPanel({ onSendMessage }: SettingsPanelProps) {
         >
           TOGGLE FULLSCREEN
         </button>
+      </Section>
+
+      {/* TV Mode */}
+      <Section label="TV MODE">
+        {tvUrl && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+            <p
+              style={{
+                fontSize: 8,
+                color: "var(--text-subtle)",
+                margin: 0,
+                letterSpacing: "0.1em",
+                textTransform: "uppercase",
+                fontFamily: "var(--font-geist-mono)",
+              }}
+            >
+              SCAN ON TV
+            </p>
+            <QRCode url={tvUrl} size={80} />
+            <button
+              onClick={() => window.open(tvUrl, "_blank")}
+              style={{
+                width: "100%",
+                padding: "8px 0",
+                fontSize: 8,
+                fontWeight: 500,
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                fontFamily: "var(--font-geist-mono)",
+                background: "var(--tag-bg)",
+                color: "var(--text-muted)",
+                border: "1px solid var(--border)",
+                borderRadius: 2,
+                cursor: "pointer",
+                transition: "all 200ms ease",
+              }}
+            >
+              OPEN TV MODE
+            </button>
+            <CastButton tvUrl={tvUrl} style={{ width: "100%" }} />
+            <button
+              onClick={() => window.open(`${origin}/remote`, "_blank")}
+              style={{
+                width: "100%",
+                padding: "8px 0",
+                fontSize: 8,
+                fontWeight: 500,
+                letterSpacing: "0.15em",
+                textTransform: "uppercase",
+                fontFamily: "var(--font-geist-mono)",
+                background: "none",
+                color: "var(--text-subtle)",
+                border: "none",
+                cursor: "pointer",
+                transition: "color 200ms ease",
+              }}
+            >
+              OPEN REMOTE &#8594;
+            </button>
+          </div>
+        )}
       </Section>
 
       <p

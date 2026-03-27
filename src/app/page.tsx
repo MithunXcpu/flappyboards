@@ -92,6 +92,7 @@ export default function Home() {
               border: "1px solid var(--border)",
               borderRadius: 2,
               padding: 12,
+              boxShadow: "var(--board-shadow)",
             }}
           >
             {/* Screen */}
@@ -231,6 +232,7 @@ export default function Home() {
             <span style={{ fontSize: 10, display: "inline-flex", alignItems: "center", gap: 5 }}><span style={{ fontSize: 11, marginTop: -1 }}>&#9733;</span>GITHUB</span>
           </a>
         </div>
+
       </div>
 
       {/* Bottom bar */}

@@ -48,9 +48,18 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const setTheme = useCallback((t: Theme) => {
-    setThemeState(t);
-    localStorage.setItem("theme", t);
-    document.documentElement.setAttribute("data-theme", t);
+    const apply = () => {
+      setThemeState(t);
+      localStorage.setItem("theme", t);
+      document.documentElement.setAttribute("data-theme", t);
+    };
+
+    // Use View Transitions API for fluid crossfade
+    if (document.startViewTransition) {
+      document.startViewTransition(apply);
+    } else {
+      apply();
+    }
   }, []);
 
   const toggleTheme = useCallback(() => {
