@@ -18,6 +18,7 @@ export default function CastButton({ tvUrl, style }: CastButtonProps) {
       style={{
         display: "flex",
         alignItems: "center",
+        justifyContent: "center",
         gap: 6,
         padding: "8px 16px",
         fontSize: 8,

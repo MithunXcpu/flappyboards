@@ -88,21 +88,23 @@ const SplitFlapTile = memo(
             flapBack.style.zIndex = "2";
 
             // Add will-change for GPU acceleration during animation
-            flapFront.style.willChange = "transform";
-            flapBack.style.willChange = "transform";
+            flapFront.style.willChange = "transform, box-shadow";
+            flapBack.style.willChange = "transform, box-shadow";
 
             const halfDuration = duration / 2;
 
-            // Phase 1: Front flap falls (0° -> -90°)
-            flapFront.style.transition = `transform ${halfDuration}ms cubic-bezier(0.55, 0.085, 0.68, 0.53)`;
+            // Phase 1: Front flap falls (0° -> -90°) with shadow growth
+            flapFront.style.transition = `transform ${halfDuration}ms cubic-bezier(0.45, 0.05, 0.55, 0.95), box-shadow ${halfDuration}ms ease`;
             flapFront.style.transform = "rotateX(-90deg)";
+            flapFront.style.boxShadow = "inset 0 1px 0 var(--tile-highlight), 0 8px 16px rgba(0,0,0,0.4)";
 
             // Phase 2: At midpoint, back flap settles (90° -> 0° with overshoot)
             setTimeout(() => {
               flapFront.style.zIndex = "1";
               flapBack.style.zIndex = "3";
-              flapBack.style.transition = `transform ${halfDuration}ms cubic-bezier(0.175, 0.885, 0.32, 1.275)`;
+              flapBack.style.transition = `transform ${halfDuration}ms cubic-bezier(0.15, 0.85, 0.3, 1.35), box-shadow ${halfDuration}ms ease`;
               flapBack.style.transform = "rotateX(0deg)";
+              flapBack.style.boxShadow = "inset 0 1px 0 var(--tile-split), 0 1px 3px var(--tile-shadow)";
             }, halfDuration);
 
             // Cleanup after animation completes
@@ -116,8 +118,10 @@ const SplitFlapTile = memo(
               flapBack.style.transition = "none";
               flapFront.style.transform = "rotateX(0deg)";
               flapFront.style.zIndex = "3";
+              flapFront.style.boxShadow = "inset 0 1px 0 var(--tile-highlight), 0 1px 3px var(--tile-shadow)";
               flapBack.style.transform = "rotateX(90deg)";
               flapBack.style.zIndex = "2";
+              flapBack.style.boxShadow = "inset 0 1px 0 var(--tile-split), 0 1px 3px var(--tile-shadow)";
 
               // Remove will-change to free GPU memory
               flapFront.style.willChange = "auto";
