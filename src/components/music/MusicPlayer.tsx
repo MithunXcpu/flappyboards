@@ -3,10 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useMusicStore } from "@/stores/music-store";
 import { useRadioPlayer } from "@/hooks/useRadioPlayer";
+import { useSpotifyPlayer } from "@/hooks/useSpotifyPlayer";
 
 export default function MusicPlayer() {
   const { source, isPlaying, currentTrack } = useMusicStore();
-  const { play, pause } = useRadioPlayer();
+  const { play: radioPlay, pause: radioPause } = useRadioPlayer();
+  const { togglePlay: spotifyToggle, skip: spotifySkip, previous: spotifyPrev } =
+    useSpotifyPlayer();
   const [opacity, setOpacity] = useState(0.6);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -27,6 +30,30 @@ export default function MusicPlayer() {
 
   if (source === "off") return null;
 
+  const handlePlayPause = () => {
+    if (source === "spotify") {
+      spotifyToggle();
+    } else {
+      isPlaying ? radioPause() : radioPlay();
+    }
+  };
+
+  const btnStyle: React.CSSProperties = {
+    width: 20,
+    height: 20,
+    background: "none",
+    border: "none",
+    cursor: "pointer",
+    color: "var(--text)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 0,
+    fontSize: 10,
+    opacity: 0.7,
+    transition: "opacity 150ms",
+  };
+
   return (
     <div
       style={{
@@ -36,6 +63,7 @@ export default function MusicPlayer() {
         zIndex: 20,
         display: "flex",
         alignItems: "center",
+        gap: source === "spotify" ? 4 : 0,
         background: "none",
         border: "none",
         padding: 0,
@@ -46,58 +74,23 @@ export default function MusicPlayer() {
       onMouseEnter={() => setOpacity(1)}
       onMouseLeave={() => setOpacity(0.6)}
     >
+      {/* Previous (Spotify only) */}
+      {source === "spotify" && (
+        <button onClick={spotifyPrev} style={btnStyle} title="Previous">
+          ⏮
+        </button>
+      )}
+
       {/* Play/Pause */}
-      <button
-        onClick={() => (isPlaying ? pause() : play())}
-        style={{
-          width: 24,
-          height: 24,
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          color: "var(--text)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 0,
-          fontSize: 12,
-        }}
-      >
+      <button onClick={handlePlayPause} style={{ ...btnStyle, fontSize: 12, opacity: 1 }}>
         {isPlaying ? "❚❚" : "▶"}
       </button>
 
-      {/* Track info */}
-      {currentTrack && (
-        <div style={{ maxWidth: 160, overflow: "hidden" }}>
-          <p
-            style={{
-              fontSize: 8,
-              fontWeight: 500,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: "var(--text)",
-              margin: 0,
-              fontFamily: "var(--font-geist-mono)",
-              whiteSpace: "nowrap",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {currentTrack.title}
-          </p>
-          <p
-            style={{
-              fontSize: 7,
-              letterSpacing: "0.05em",
-              textTransform: "uppercase",
-              color: "var(--text-muted)",
-              margin: "2px 0 0",
-              fontFamily: "var(--font-geist-mono)",
-            }}
-          >
-            {currentTrack.artist}
-          </p>
-        </div>
+      {/* Next (Spotify only) */}
+      {source === "spotify" && (
+        <button onClick={spotifySkip} style={btnStyle} title="Next">
+          ⏭
+        </button>
       )}
     </div>
   );
