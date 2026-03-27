@@ -42,7 +42,7 @@ export async function searchStations(
   );
   if (!res.ok) return [];
   const data: RawStation[] = await res.json();
-  return data.filter((s) => s.url_resolved).map(mapStation);
+  return data.filter((s) => s.url_resolved?.startsWith("https://")).map(mapStation);
 }
 
 export async function getStationsByGenre(
@@ -55,7 +55,7 @@ export async function getStationsByGenre(
   );
   if (!res.ok) return [];
   const data: RawStation[] = await res.json();
-  return data.filter((s) => s.url_resolved).map(mapStation);
+  return data.filter((s) => s.url_resolved?.startsWith("https://")).map(mapStation);
 }
 
 export async function getPopularStations(
@@ -67,7 +67,7 @@ export async function getPopularStations(
   );
   if (!res.ok) return [];
   const data: RawStation[] = await res.json();
-  return data.filter((s) => s.url_resolved).map(mapStation);
+  return data.filter((s) => s.url_resolved?.startsWith("https://")).map(mapStation);
 }
 
 export const GENRE_PRESETS = [
