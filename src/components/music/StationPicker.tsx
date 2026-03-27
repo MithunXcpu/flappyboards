@@ -129,6 +129,7 @@ export default function StationPicker() {
       <div
         style={{
           maxHeight: 160,
+          overflowX: "hidden",
           overflowY: "auto",
           borderRadius: 2,
           border: stations.length ? "1px solid var(--border)" : "none",

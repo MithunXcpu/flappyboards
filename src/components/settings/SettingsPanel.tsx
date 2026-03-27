@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useSettingsStore } from "@/stores/settings-store";
 import { audioEngine } from "@/lib/audio/audio-engine";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -113,18 +114,22 @@ export default function SettingsPanel({ onSendMessage }: SettingsPanelProps) {
     );
   }
 
-  return (
+  return createPortal(
     <div
       style={{
         position: "fixed",
-        inset: "0 0 0 auto",
+        top: 0,
+        right: 0,
+        bottom: 0,
         zIndex: 50,
         width: 300,
+        height: "100vh",
         background: "var(--glass-bg-solid)",
         backdropFilter: "blur(24px) saturate(1.2)",
         WebkitBackdropFilter: "blur(24px) saturate(1.2)",
         borderLeft: "1px solid var(--border)",
         padding: "28px 24px",
+        overflowX: "hidden",
         overflowY: "auto",
         transition: "transform 200ms ease",
       }}
@@ -382,7 +387,8 @@ export default function SettingsPanel({ onSendMessage }: SettingsPanelProps) {
       >
         PRESS ESC TO CLOSE
       </p>
-    </div>
+    </div>,
+    document.body
   );
 }
 
